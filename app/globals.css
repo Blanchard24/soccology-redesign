@@ -1,26 +1,275 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+/* =========================================================================
+ * VARIABLES CSS — exposition des design tokens (Direction A)
+ * -------------------------------------------------------------------------
+ * ⚠️ SOURCE UNIQUE DE VÉRITÉ : /lib/tokens.ts
+ * Ces valeurs reflètent `tokens.cssVariables`. Ne pas diverger : si une couleur
+ * change, la changer dans tokens.ts PUIS répercuter ici (couche d'exposition).
+ * Aucune couleur en dur ne doit apparaître ailleurs que dans tokens.ts + ici.
+ *
+ * Thème clair = défaut (:root). Thème sombre "terrain" = opt-in, applicable
+ * globalement (.dark sur <html>) ou localement sur n'importe quelle section
+ * ([data-theme="dark"]) — ex. hero sombre avec ballon 3D.
+ * ===================================================================== */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Couleurs — thème clair (themes.light) */
+  --color-background: #f4f1ea;
+  --color-foreground: #141414;
+  --color-surface: #ffffff;
+  --color-surface-muted: #ebe7dd;
+  --color-surface-deep: #e1dbcd;
+  --color-muted-foreground: #4a4741;
+  --color-faint-foreground: #7a756b;
+  --color-accent: #e0552b;
+  --color-accent-foreground: #141414;
+  --color-accent-hover: #c2431e;
+  --color-accent-soft: #f3d8cb;
+  --color-support: #1f3a2e;
+  --color-support-foreground: #f4f1ea;
+  --color-border: #d8d2c4;
+  --color-border-strong: #141414;
+  --color-ring: #e0552b;
+
+  /* Rayons (radius) */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  /* Filets horizontaux fins — signature Direction A */
+  --rule-thin: 1px;
+  --rule-regular: 2px;
+  --rule-thick: 4px;
+
+  /* Largeurs de mise en page */
+  --container-max: 80rem;
+  --prose-max: 42rem;
+
+  /* Courbe d'animation éditoriale (tokens.motion.ease) */
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Thème sombre "terrain" (themes.dark) — global ou par section */
+.dark,
+[data-theme="dark"] {
+  --color-background: #1f3a2e;
+  --color-foreground: #f4f1ea;
+  --color-surface: #16281f;
+  --color-surface-muted: #33513f;
+  --color-surface-deep: #16281f;
+  --color-muted-foreground: #c8cfc7;
+  --color-faint-foreground: #8c9a8f;
+  --color-accent: #e0552b;
+  --color-accent-foreground: #141414;
+  --color-accent-hover: #c2431e;
+  --color-accent-soft: #f3d8cb;
+  --color-support: #f4f1ea;
+  --color-support-foreground: #141414;
+  --color-border: #33513f;
+  --color-border-strong: #f4f1ea;
+  --color-ring: #e0552b;
+}
+
+/* =========================================================================
+ * THÈME TAILWIND — génère les utilitaires (bg-accent, text-foreground, …)
+ * `inline` : les utilitaires résolvent les var() à l'usage, donc suivent
+ * automatiquement le thème clair/sombre courant.
+ * ===================================================================== */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-surface: var(--color-surface);
+  --color-surface-muted: var(--color-surface-muted);
+  --color-surface-deep: var(--color-surface-deep);
+  --color-muted-foreground: var(--color-muted-foreground);
+  --color-faint-foreground: var(--color-faint-foreground);
+  --color-accent: var(--color-accent);
+  --color-accent-foreground: var(--color-accent-foreground);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-soft: var(--color-accent-soft);
+  --color-support: var(--color-support);
+  --color-support-foreground: var(--color-support-foreground);
+  --color-border: var(--color-border);
+  --color-border-strong: var(--color-border-strong);
+  --color-ring: var(--color-ring);
+
+  /* Polices — alimentées par next/font (layout.tsx) */
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-archivo);
+  --font-display: var(--font-anton);
+
+  /* Rayons */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+
+  /* Échelle typographique (typography.scale) */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+  --text-3xl: 2.75rem;
+  --text-4xl: 3.75rem;
+  --text-5xl: 5rem;
+  --text-6xl: 7rem;
+  --text-7xl: 9.5rem;
+
+  /* Conteneur éditorial */
+  --spacing-container: 80rem;
+  --spacing-prose: 42rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* =========================================================================
+ * BASE
+ * ===================================================================== */
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans, system-ui, sans-serif);
+    font-size: var(--text-base);
+    line-height: 1.65; /* typography.leading.body — corps aéré */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Titres : grotesque à caractère (Archivo par défaut, Anton pour le display) */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading, var(--font-sans));
+    line-height: 1.1; /* typography.leading.heading */
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  /* Focus visible accessible (WCAG 2.1 AA) */
+  :focus-visible {
+    outline: var(--rule-regular) solid var(--color-ring);
+    outline-offset: 2px;
+  }
+
+  /* Respect de prefers-reduced-motion (cf. SPEC-BALLON-3D §7) */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* =========================================================================
+ * UTILITAIRES DE MARQUE — signature Direction A
+ * ===================================================================== */
+@layer components {
+  /* Conteneur éditorial centré, largeur max maîtrisée */
+  .container-editorial {
+    width: 100%;
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  /* Titre display massif (Anton), aligné à gauche */
+  .display-title {
+    font-family: var(--font-display, var(--font-heading));
+    line-height: 0.92; /* typography.leading.tight */
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+
+  /* Numéro de section 01 / 02 / 03 — signature */
+  .section-number {
+    font-family: var(--font-display, var(--font-heading));
+    color: var(--color-accent);
+    letter-spacing: 0.02em;
+  }
+
+  /* Filet horizontal fin — l'élément récurrent */
+  .rule-line {
+    height: var(--rule-thin);
+    background-color: var(--color-border-strong);
+    border: 0;
+  }
+
+  /* Bande déroulante — piste d'un défilement infini (cf. MarqueeBand.tsx).
+   * Deux pistes identiques côte à côte translatent de -100% de LEUR propre
+   * largeur : quand la première a fini de sortir, la seconde occupe exactement
+   * sa place de départ, donc la boucle est invisible.
+   *
+   * En CSS et non en JS : le défilement marche sans hydratation, et le bloc
+   * `prefers-reduced-motion` plus haut (animation-duration: 0.01ms) l'immobilise
+   * déjà tout seul, sans un test de plus dans le composant.
+   *
+   * Aucune pause (survol, focus ou bouton) : choix produit explicite.
+   * Voir la note WCAG 2.2.2 dans MarqueeBand.tsx. */
+  .marquee-track {
+    animation: marquee var(--marquee-duration, 45s) linear infinite;
+    will-change: transform;
+  }
+
+  /* Transition de page douce (DA §4) — appliquée par app/template.tsx.
+   * En CSS et non en JS : la transition marche donc même sans hydratation,
+   * et le bloc `prefers-reduced-motion` plus haut la neutralise déjà.
+   * Fondu SEUL, sans translate : un `transform` persistant sur ce wrapper
+   * créerait un bloc conteneur qui casserait tout `position: fixed` interne. */
+  .page-enter {
+    animation: page-enter 0.35s var(--ease-editorial) both;
+  }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* =========================================================================
+ * FILET DE SÉCURITÉ SANS JAVASCRIPT
+ * -------------------------------------------------------------------------
+ * Les composants d'apparition au scroll (<Reveal>, <Stagger>, <AnimatedHeading>)
+ * s'appuient sur Framer Motion, qui écrit `opacity: 0` EN STYLE INLINE dès le
+ * rendu serveur. Sans JS, l'IntersectionObserver ne déclenche jamais et le
+ * contenu resterait invisible pour de bon — inacceptable pour une ONG santé
+ * mentale (et pour le SEO).
+ *
+ * `!important` dans une feuille de style l'emporte sur un style inline
+ * non-important : c'est ce qui permet de rattraper le coup ici.
+ * ===================================================================== */
+@media (scripting: none) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

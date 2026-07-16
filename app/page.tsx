@@ -1,65 +1,96 @@
-import Image from "next/image";
+import { Hero } from "@/components/Hero";
+import { StatBanner } from "@/components/StatBanner";
+import { PartnerLogos } from "@/components/PartnerLogos";
+import { AudienceCards } from "@/components/AudienceCards";
+import { ServiceCard } from "@/components/ServiceCard";
+import { FlagshipPreview } from "@/components/FlagshipPreview";
+import { BlogPreview } from "@/components/BlogPreview";
+import { ContactForm } from "@/components/ContactForm";
+import { SectionHeading } from "@/components/SectionHeading";
+import { MarqueeBand } from "@/components/MarqueeBand";
+import { siteConfig } from "@/content/site.config";
 
-export default function Home() {
+/**
+ * Accueil — structure BRIEF §5, dans l'ordre :
+ *   Hero → bandeau stat d'impact → How we work → mur de logos partenaires →
+ *   Who we help → aperçu projet phare → aperçu blog → CTA final + contact.
+ *
+ * Règles de layout DA §3 : alternance des compositions, grille éditoriale,
+ * jamais tout centré. Hero en version STATIQUE (ballon 3D branché plus tard).
+ */
+export default function HomePage() {
+  const { services, contact, homePage } = siteConfig;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      {/* 1. Hero */}
+      <Hero />
+
+      {/* 2. Bandeau stat d'impact */}
+      <StatBanner />
+
+      {/* 3. How we work (formats de service) — split 2 colonnes */}
+      <section aria-label="How we work" className="bg-surface-muted text-foreground">
+        <div className="container-editorial grid grid-cols-1 gap-12 py-20 md:py-28 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <SectionHeading index={1} eyebrow="Services" title="How we work" />
+            <p className="mt-6 max-w-sm text-muted-foreground">
+              Football-led interventions, by format and by audience — each with a
+              clear next step.
+            </p>
+          </div>
+          <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:col-span-7 lg:col-start-6">
+            {services.map((service, i) => (
+              <li key={service.id}>
+                <ServiceCard
+                  index={i + 1}
+                  title={service.title}
+                  description={service.description}
+                  href={service.href}
+                />
+              </li>
+            ))}
+          </ul>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* 4. Mur de logos partenaires */}
+      <PartnerLogos />
+
+      {/* 5. Who we help — grille 4 colonnes */}
+      <AudienceCards index={2} />
+
+      {/* 6. Aperçu du projet phare — Keep The Dream Alive! (sombre, split) */}
+      <FlagshipPreview index={3} />
+
+      {/* 7. Aperçu blog */}
+      <BlogPreview index={4} posts={[]} />
+
+      {/* 8a. Bande déroulante — respiration typographique avant le contact.
+          Le CTA de conversion est assuré juste en dessous par le formulaire
+          (et en permanence par le « Support us » du header). */}
+      <MarqueeBand text={homePage.marquee.text} />
+
+      {/* 8b. Formulaire de contact court — split */}
+      <section
+        id="contact"
+        aria-label="Contact"
+        className="bg-surface-muted text-foreground"
+      >
+        <div className="container-editorial grid grid-cols-1 gap-12 py-20 md:py-28 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <SectionHeading index={5} eyebrow="Contact" title="Start a conversation" />
+            <p className="mt-6 max-w-sm text-muted-foreground">
+              Whether you&apos;re a family, a school, a partner or a supporter —
+              tell us how we can help.
+            </p>
+            <p className="mt-6 text-sm text-muted-foreground">{contact.location}</p>
+          </div>
+          <div className="lg:col-span-7 lg:col-start-6">
+            <ContactForm />
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+    </>
   );
 }
